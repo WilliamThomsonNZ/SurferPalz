@@ -1,8 +1,8 @@
-# Staking Contract Template built in Hardhat & Next.js
+# SurferPalz 
 
 Contracts include: 
-- Basic NFT Contract ( ERC721 )
-- Basic ERC20 Token contract implementation
+- NFT Contract ( ERC721A )
+- ERC20 Token contract implementation
 - Contract for Staking NFT to earn token
 
 Frontend:
