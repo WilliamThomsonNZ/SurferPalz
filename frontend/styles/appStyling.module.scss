@@ -1,0 +1,30 @@
+.header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 50px;
+  .navigation {
+    width: 150px;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.mainContainer {
+  display: flex;
+  justify-content: center;
+}
+.stakedItemContainer {
+  width: 350px;
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+.stakeContainer {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 50px;
+  margin-top: 50px;
+}
