@@ -6,12 +6,15 @@ export function AppWrapper({ children }) {
   const [userWallet, setUserWallet] = useState("");
   const [walletConnected, setWalletConnected] = useState(false);
   const [web3Modal, setWeb3Modal] = useState({});
+  const [approvalForTokens, setApprovalForTokens] = useState(false);
 
   let userWalletState = {
     updateWalletAddress: (val) => setUserWallet(val),
     updateWalletConnected: (val) => setWalletConnected(val),
     updateWeb3Modal: (val) => setWeb3Modal(val),
+    updateUserApproval: (val) => setApprovalForTokens(val),
     walletConnected,
+    approvalForTokens,
     userWallet,
     web3Modal,
   };

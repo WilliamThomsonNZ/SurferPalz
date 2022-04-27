@@ -1,9 +1,9 @@
 export const NFT_CONTRACT_ADDRESS =
-  "0x9A676e781A523b5d0C0e43731313A708CB607508";
+  "0x99bbA657f2BbC93c02D617f8bA121cB8Fc104Acf";
 export const TOKEN_CONTRACT_ADDRESS =
   "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82";
 export const STAKING_CONTRACT_ADDRESS =
-  "0x0B306BF915C4d645ff596e518fAf3F9669b97016";
+  "0x0E801D84Fa97b50751Dbf25036d067dCf18858bF";
 export const NFT_ABI = [
   {
     inputs: [],
@@ -33,6 +33,11 @@ export const NFT_ABI = [
   {
     inputs: [],
     name: "BalanceQueryForZeroAddress",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidQueryRange",
     type: "error",
   },
   {
@@ -196,6 +201,78 @@ export const NFT_ABI = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "explicitOwnershipOf",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "addr",
+            type: "address",
+          },
+          {
+            internalType: "uint64",
+            name: "startTimestamp",
+            type: "uint64",
+          },
+          {
+            internalType: "bool",
+            name: "burned",
+            type: "bool",
+          },
+        ],
+        internalType: "struct ERC721A.TokenOwnership",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256[]",
+        name: "tokenIds",
+        type: "uint256[]",
+      },
+    ],
+    name: "explicitOwnershipsOf",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "addr",
+            type: "address",
+          },
+          {
+            internalType: "uint64",
+            name: "startTimestamp",
+            type: "uint64",
+          },
+          {
+            internalType: "bool",
+            name: "burned",
+            type: "bool",
+          },
+        ],
+        internalType: "struct ERC721A.TokenOwnership[]",
+        name: "",
+        type: "tuple[]",
       },
     ],
     stateMutability: "view",
@@ -521,6 +598,54 @@ export const NFT_ABI = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "tokensOfOwner",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "start",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "stop",
+        type: "uint256",
+      },
+    ],
+    name: "tokensOfOwnerIn",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "totalSupply",
     outputs: [
@@ -713,6 +838,11 @@ export const STAKING_ABI = [
         name: "_tokenId",
         type: "uint256",
       },
+      {
+        internalType: "uint256",
+        name: "_stakeType",
+        type: "uint256",
+      },
     ],
     name: "stake",
     outputs: [],
@@ -725,6 +855,11 @@ export const STAKING_ABI = [
         internalType: "uint256[]",
         name: "_tokenIds",
         type: "uint256[]",
+      },
+      {
+        internalType: "uint256",
+        name: "_stakeType",
+        type: "uint256",
       },
     ],
     name: "stakeMultiple",
@@ -764,12 +899,22 @@ export const STAKING_ABI = [
         type: "uint256",
       },
     ],
-    name: "tokenOwners",
+    name: "tokens",
     outputs: [
       {
         internalType: "address",
-        name: "",
+        name: "owner",
         type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "stakeType",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "timeOfStaking",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

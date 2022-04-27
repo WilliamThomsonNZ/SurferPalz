@@ -3,9 +3,9 @@ pragma solidity ^0.8.4;
 
 //import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "erc721a/contracts/ERC721A.sol";
+import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 
-contract GameItem is ERC721A, Ownable {
+contract GameItem is ERC721AQueryable, Ownable {
     using Strings for uint256;
     uint256 public maxTotalSupply = 4444;
     uint256 public mintPrice = 0.01 ether;

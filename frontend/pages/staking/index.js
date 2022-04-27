@@ -21,6 +21,7 @@ export default function Staking() {
   const [tokensToBeUnstaked, setTokensToBeUnstaked] = useState([]);
   const [claimableTokens, setClaimableTokens] = useState(0);
   const [userGTBalance, setUserGTBalance] = useState(0);
+
   async function getOwnersTokens() {
     const tokens = await listTokensOfOwner(
       NFT_CONTRACT_ADDRESS,
@@ -30,8 +31,18 @@ export default function Staking() {
     console.log(tokens);
     setUsersTokens(tokens);
   }
-  async function getTokens() {
-    getOwnersTokens();
+  async function getTokensOfOwner() {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const addr = await signer.getAddress();
+      const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
+      const tokens = await contract.tokensOfOwner(addr);
+      setUsersTokens(tokens.map((token) => Number(token)));
+    } catch (err) {
+      console.error(err);
+    }
+
+    //getOwnersTokens();
   }
 
   function updateTokensToBeStaked(token) {
@@ -59,10 +70,14 @@ export default function Staking() {
     setTokensToBeUnstaked(tempArr);
   }
 
-  async function handleStake() {
+  async function handleStake(stakeType) {
+    console.log(userState);
     if (!tokensToBeStaked.length) {
       window.alert("You must select some tokens to stake");
       return;
+    }
+    if (!userState.approvalForTokens) {
+      await handleApproval();
     }
     try {
       const signer = await getProviderOrSigner(true);
@@ -73,9 +88,9 @@ export default function Staking() {
       );
       let tx;
       if (tokensToBeStaked.length > 1) {
-        tx = await contract.stakeMultiple(tokensToBeStaked);
+        tx = await contract.stakeMultiple(tokensToBeStaked, stakeType);
       } else {
-        tx = await contract.stake(...tokensToBeStaked);
+        tx = await contract.stake(...tokensToBeStaked, stakeType);
       }
       await tx.wait();
       setTokensToBeStaked([]);
@@ -83,6 +98,7 @@ export default function Staking() {
       console.error(error);
     }
   }
+
   async function handleApproval() {
     try {
       const signer = await getProviderOrSigner(true);
@@ -92,6 +108,7 @@ export default function Staking() {
         true
       );
       await tx.wait();
+      userState.updateUserApproval(true);
     } catch (error) {
       console.error(error);
     }
@@ -175,6 +192,7 @@ export default function Staking() {
       console.error(err);
     }
   }
+
   useEffect(() => {
     getUserTokenBalance();
   }, []);
@@ -182,10 +200,11 @@ export default function Staking() {
     <div>
       <Header />
       <main className={styles.mainContainer}>
-        <button onClick={() => handleStake()}>Stake</button>
+        <button onClick={() => handleStake(0)}>Stake Pipeline</button>
+        <button onClick={() => handleStake(1)}>Stake Trestles</button>
+        <button onClick={() => handleStake(2)}>Stake Snapper</button>
         <button onClick={() => handleUnstake()}>Unstake</button>
-        <button onClick={() => getTokens()}>Get Tokens</button>
-        <button onClick={() => handleApproval()}>setApprovalForAll</button>
+        <button onClick={() => getTokensOfOwner()}>Get Tokens</button>
         <button onClick={() => getUserStakedTokens()}>getStakedTokens</button>
         <span>GT balance: {userGTBalance}</span>
         <button onClick={(e) => claimTokens(e)}>Claim Tokens</button>

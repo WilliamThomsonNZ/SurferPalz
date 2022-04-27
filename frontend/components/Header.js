@@ -2,7 +2,11 @@ import { useAppContext } from "../context/state";
 import { getProviderOrSigner } from "../utils";
 import { readifyAddress } from "../utils";
 import { useEffect, useState } from "react";
-import { STAKING_CONTRACT_ADDRESS, STAKING_ABI } from "../constants";
+import {
+  NFT_CONTRACT_ADDRESS,
+  NFT_ABI,
+  STAKING_CONTRACT_ADDRESS,
+} from "../constants";
 import { Contract } from "ethers";
 import Link from "next/link";
 import styles from "../styles/appStyling.module.scss";
@@ -12,6 +16,12 @@ export default function Header({ currentPage, tokenBalance }) {
     try {
       const signer = await getProviderOrSigner(true);
       const addr = await signer.getAddress();
+      const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
+      const isApproved = await contract.isApprovedForAll(
+        addr,
+        STAKING_CONTRACT_ADDRESS
+      );
+      userState.updateUserApproval(isApproved);
       userState.updateWalletAddress(addr);
       userState.updateWalletConnected(true);
     } catch (err) {
