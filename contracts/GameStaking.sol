@@ -49,8 +49,8 @@ contract ItemStake {
     function getClaimableTokens() external returns (uint256) {
         Staker storage staker = stakers[msg.sender];
         calculateRewards(msg.sender);
-        uint256 tokens = staker.tokenBalance;
-        return tokens;
+        uint256 tokenBalance = staker.tokenBalance;
+        return tokenBalance;
     }
 
     function claimTokens() public {
@@ -107,7 +107,7 @@ contract ItemStake {
         Staker storage staker = stakers[_user];
         StakedItem storage stakedItem = tokens[_tokenId];
         require(
-            block.timestamp - stakedItem.timeOfStaking > 2 minutes,
+            block.timestamp - stakedItem.timeOfStaking > 10,
             "TOKEN_NOT_READY_TO_BE_UNSTAKED"
         );
 
@@ -117,6 +117,8 @@ contract ItemStake {
 
         staker.stakedTokens[tokenIdIndex] = lastIndexKey;
         staker.tokenIndex[lastIndexKey] = tokenIdIndex;
+        console.log(lastIndex, lastIndexKey, tokenIdIndex, _tokenId);
+
         if (staker.stakedTokens.length > 0) {
             staker.stakedTokens.pop();
             delete staker.tokenIndex[_tokenId];
@@ -125,7 +127,6 @@ contract ItemStake {
             delete stakers[_user];
         }
         delete tokens[_tokenId];
-
         gameItem.safeTransferFrom(address(this), _user, _tokenId);
 
         emit NFTUnstaked(_user, _tokenId);
@@ -139,7 +140,6 @@ contract ItemStake {
     }
 
     function unstakeMultiple(uint256[] calldata _tokenIds) external {
-        console.log(_tokenIds);
         claimTokens();
         for (uint256 i = 0; i < _tokenIds.length; i++) {
             uint256 tokenId = _tokenIds[i];
