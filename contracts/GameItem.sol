@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "erc721a/contracts/extensions/ERC721AQueryable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
     using Strings for uint256;
@@ -23,12 +24,14 @@ contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
     uint256 public mintPrice = 0.01 ether;
     uint256 public maxMintPerTx = 2;
     string private baseURI;
+    bytes32 private whitelistMerkleRoot;
 
     //Contract state
     bool public paused = false;
 
     mapping(uint256 => uint256) public surferStatsById;
     mapping(uint256 => address) internal requestToSender;
+    mapping(address => bool) private whitelistUsed;
 
     constructor(uint64 _subscriptionId, bytes32 _keyHash)
         VRFConsumerBaseV2(vrfCoordinator)
@@ -81,6 +84,34 @@ contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
             currentTokenId++;
         }
         _safeMint(requestToSender[requestedId], s_randomWords.length);
+    }
+
+    function whitelistMint(bytes32[] calldata _proof, uint256 _amount)
+        external
+        payable
+    {
+        bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+        require(whitelistUsed[msg.sender] == false, "WHITELIST_ALREADY_USED");
+        require(
+            MerkleProof.verify(_proof, whitelistMerkleRoot, leaf),
+            "NOT_ON_WHITELIST"
+        );
+        require(_amount <= maxMintPerTx, "2_PER_TX_MAX");
+        require(!paused, "MINTING_IS_PAUSED");
+        require(
+            _amount + _currentIndex <= maxTotalSupply,
+            "MAX_SUPPLY_REACHED"
+        );
+        require(msg.value == _amount * mintPrice, "INCORRECT_ETH_AMOUNT");
+        whitelistUsed[msg.sender] = true;
+        requestId = COORDINATOR.requestRandomWords(
+            keyHash,
+            subscriptionId,
+            requestConfirmations,
+            callbackGasLimit,
+            _amount
+        );
+        requestToSender[requestId] = msg.sender;
     }
 
     function mint(uint32 _amount) public payable callerIsUser {
@@ -139,6 +170,13 @@ contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
             value: address(this).balance
         }("");
         require(success);
+    }
+
+    function setWhitelistMerkleRoot(bytes32 _whitelistMerkleRoot)
+        external
+        onlyOwner
+    {
+        whitelistMerkleRoot = _whitelistMerkleRoot;
     }
 
     function tokenURI(uint256 tokenId)

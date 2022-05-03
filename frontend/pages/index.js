@@ -12,7 +12,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   async function handleMint() {
     if (!userState.userWallet) {
-      handleError("Please connect your wallet");
       return;
     }
     if (loading) return;
@@ -42,6 +41,47 @@ export default function Home() {
       setLoading(false);
     }
   }
+
+  async function checkOnWhitelist(_address) {
+    const response = await fetch(`/api/whitelist?address=${_address}`);
+    const json = await response.json();
+    return json.onWhitelist;
+  }
+
+  async function handleWhitelistMint() {
+    if (!userState.userWallet) {
+      return;
+    }
+    if (loading) return;
+    const addr = "0x99E48f65f57b7b4C6f253eFfC5429192F0916215";
+    setLoading(true);
+    const onWhitelist = await checkOnWhitelist(addr);
+    if (onWhitelist) {
+      try {
+        const signer = await getProviderOrSigner(true);
+        const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
+        const mintValue = String(amountToMint * mintPrice);
+        const tx = await contract.whitelistMint(amountToMint, {
+          value: utils.parseEther(mintValue),
+        });
+        await tx.wait();
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        let errorMessage;
+        switch (err.code) {
+          case "INSUFFICIENT_FUNDS":
+            errorMessage = "Insufficient funds.";
+            break;
+          default:
+            errorMessage =
+              "An error occured and the transaction was not processed.";
+            break;
+        }
+      }
+    }
+    setLoading(false);
+  }
   return (
     <div className={styles.container}>
       <Header />
@@ -54,6 +94,7 @@ export default function Home() {
           value={amountToMint}
         />
         <button onClick={() => handleMint()}>Mint</button>
+        <button onClick={() => handleWhitelistMint()}>Mint Whitelist</button>
       </main>
     </div>
   );
