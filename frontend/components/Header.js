@@ -13,6 +13,9 @@ import styles from "../styles/appStyling.module.scss";
 export default function Header({ currentPage, tokenBalance }) {
   const userState = useAppContext();
   async function connectWallet() {
+    //Display the two options here
+    //-- wallet connect
+    //--
     try {
       const signer = await getProviderOrSigner(true);
       const addr = await signer.getAddress();

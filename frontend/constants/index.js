@@ -1,12 +1,23 @@
 export const NFT_CONTRACT_ADDRESS =
-  "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
+  "0x5475B743d3311afE5cFb41A0418598Ffd35b459B";
 export const TOKEN_CONTRACT_ADDRESS =
-  "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82";
+  "0x8E4E5941DAe345780d104fE8A0eA0De08C601313";
 export const STAKING_CONTRACT_ADDRESS =
-  "0x0E801D84Fa97b50751Dbf25036d067dCf18858bF";
+  "0x4b9BB1069392f5e896415270e410226f25ABc621";
 export const NFT_ABI = [
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint64",
+        name: "_subscriptionId",
+        type: "uint64",
+      },
+      {
+        internalType: "bytes32",
+        name: "_keyHash",
+        type: "bytes32",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "constructor",
   },
@@ -48,6 +59,22 @@ export const NFT_ABI = [
   {
     inputs: [],
     name: "MintZeroQuantity",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "have",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "want",
+        type: "address",
+      },
+    ],
+    name: "OnlyCoordinatorCanFulfill",
     type: "error",
   },
   {
@@ -300,6 +327,82 @@ export const NFT_ABI = [
   {
     inputs: [
       {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getFlow",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getPower",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getSpeed",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "getStyle",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "address",
         name: "owner",
         type: "address",
@@ -350,9 +453,9 @@ export const NFT_ABI = [
   {
     inputs: [
       {
-        internalType: "uint256",
+        internalType: "uint32",
         name: "_amount",
-        type: "uint256",
+        type: "uint32",
       },
     ],
     name: "mint",
@@ -432,10 +535,60 @@ export const NFT_ABI = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "requestId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256[]",
+        name: "randomWords",
+        type: "uint256[]",
+      },
+    ],
+    name: "rawFulfillRandomWords",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "renounceOwnership",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "requestId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "s_randomWords",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -536,6 +689,19 @@ export const NFT_ABI = [
   {
     inputs: [
       {
+        internalType: "bytes32",
+        name: "_whitelistMerkleRoot",
+        type: "bytes32",
+      },
+    ],
+    name: "setWhitelistMerkleRoot",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "bytes4",
         name: "interfaceId",
         type: "bytes4",
@@ -553,13 +719,19 @@ export const NFT_ABI = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "symbol",
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "surferStatsById",
     outputs: [
       {
-        internalType: "string",
+        internalType: "uint256",
         name: "",
-        type: "string",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -567,12 +739,12 @@ export const NFT_ABI = [
   },
   {
     inputs: [],
-    name: "tokenID",
+    name: "symbol",
     outputs: [
       {
-        internalType: "uint256",
+        internalType: "string",
         name: "",
-        type: "uint256",
+        type: "string",
       },
     ],
     stateMutability: "view",
@@ -692,6 +864,24 @@ export const NFT_ABI = [
     name: "transferOwnership",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32[]",
+        name: "_proof",
+        type: "bytes32[]",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "whitelistMint",
+    outputs: [],
+    stateMutability: "payable",
     type: "function",
   },
   {

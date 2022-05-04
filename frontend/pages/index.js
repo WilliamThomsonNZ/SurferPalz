@@ -10,13 +10,13 @@ export default function Home() {
   const userState = useAppContext();
   const [amountToMint, setAmountToMint] = useState(0);
   const [loading, setLoading] = useState(false);
+  const mintPrice = 0.01;
   async function handleMint() {
     if (!userState.userWallet) {
       return;
     }
     if (loading) return;
     setLoading(true);
-    const mintPrice = 0.01;
     try {
       const signer = await getProviderOrSigner(true);
       const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
@@ -48,40 +48,39 @@ export default function Home() {
     return json.onWhitelist;
   }
 
-  async function handleWhitelistMint() {
-    if (!userState.userWallet) {
-      return;
+  async function getMerkleProof(_address) {
+    const response = await fetch(`/api/merkletree?address=${_address}`);
+    const json = await response.json();
+    if (json.code == 200) {
+      return json.proof;
+    } else {
+      return [];
     }
+  }
+
+  async function handleWhitelistMint() {
+    if (!userState.userWallet) return;
     if (loading) return;
-    const addr = "0x99E48f65f57b7b4C6f253eFfC5429192F0916215";
     setLoading(true);
-    const onWhitelist = await checkOnWhitelist(addr);
-    if (onWhitelist) {
-      try {
-        const signer = await getProviderOrSigner(true);
-        const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
-        const mintValue = String(amountToMint * mintPrice);
-        const tx = await contract.whitelistMint(amountToMint, {
-          value: utils.parseEther(mintValue),
-        });
-        await tx.wait();
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        let errorMessage;
-        switch (err.code) {
-          case "INSUFFICIENT_FUNDS":
-            errorMessage = "Insufficient funds.";
-            break;
-          default:
-            errorMessage =
-              "An error occured and the transaction was not processed.";
-            break;
-        }
-      }
+    //Check if user is on whitelist via API.
+    const onWhitelist = await checkOnWhitelist(userState.userWallet);
+    if (!onWhitelist) return;
+
+    try {
+      const proof = await getMerkleProof(userState.userWallet);
+      const signer = await getProviderOrSigner(true);
+      const contract = new Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, signer);
+      const mintValue = String(amountToMint * mintPrice);
+      const tx = await contract.whitelistMint(proof, amountToMint, {
+        value: utils.parseEther(mintValue),
+      });
+      await tx.wait();
+    } catch (err) {
+      console.error(err);
     }
     setLoading(false);
   }
+
   return (
     <div className={styles.container}>
       <Header />

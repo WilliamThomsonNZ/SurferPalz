@@ -104,14 +104,16 @@ contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
         );
         require(msg.value == _amount * mintPrice, "INCORRECT_ETH_AMOUNT");
         whitelistUsed[msg.sender] = true;
-        requestId = COORDINATOR.requestRandomWords(
-            keyHash,
-            subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            _amount
-        );
-        requestToSender[requestId] = msg.sender;
+        _safeMint(msg.sender, _amount);
+
+        // requestId = COORDINATOR.requestRandomWords(
+        //     keyHash,
+        //     subscriptionId,
+        //     requestConfirmations,
+        //     callbackGasLimit,
+        //     uint32(_amount)
+        // );
+        //requestToSender[requestId] = msg.sender;
     }
 
     function mint(uint32 _amount) public payable callerIsUser {
@@ -122,14 +124,15 @@ contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
             "MAX_SUPPLY_REACHED"
         );
         require(msg.value == _amount * mintPrice, "INCORRECT_ETH_AMOUNT");
-        requestId = COORDINATOR.requestRandomWords(
-            keyHash,
-            subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            _amount
-        );
-        requestToSender[requestId] = msg.sender;
+        // requestId = COORDINATOR.requestRandomWords(
+        //     keyHash,
+        //     subscriptionId,
+        //     requestConfirmations,
+        //     callbackGasLimit,
+        //     _amount
+        // );
+        // requestToSender[requestId] = msg.sender;
+        _safeMint(msg.sender, _amount);
     }
 
     function setBaseURI(string memory _newURI) public onlyOwner {

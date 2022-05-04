@@ -7,6 +7,7 @@ function generateRoot() {
   const leaves = addresses.map((addr) => keccak256(addr));
   const tree = new MerkleTree(leaves, keccak256);
   const root = tree.getRoot().toString("hex");
+  console.log(root);
   return [root, tree];
 }
 
@@ -20,7 +21,6 @@ function generateProof(_address) {
 const handler = nc().get((req, res) => {
   try {
     const addr = req.query.address;
-    console.log(addr);
     const proof = generateProof(addr);
     res.json({ code: 200, proof: proof });
   } catch (err) {

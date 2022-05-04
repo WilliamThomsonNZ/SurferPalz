@@ -12,9 +12,9 @@ const handler = nc().get((req, res) => {
     const addr = req.query.address;
     const isOnWhitelist = onWhitelist(addr);
     if (isOnWhitelist) {
-      res.json({ code: 200, onWhiteliist: true });
+      res.json({ code: 200, onWhitelist: true });
     } else {
-      res.json({ code: 200, onWhiteliist: false });
+      res.json({ code: 200, onWhitelist: false });
     }
   } catch (err) {
     res.json({ code: 400, message: err.message });

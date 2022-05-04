@@ -11,7 +11,7 @@ export async function getProviderOrSigner(needSigner = false) {
   const provider = await web3modal.connect();
   const web3Provider = new providers.Web3Provider(provider);
   const { chainId } = await web3Provider.getNetwork();
-  if (chainId != 31337) {
+  if (chainId != 4) {
     window.alert("Change the network to Localhost");
     throw new Error("Change network to rinkeby");
   }
