@@ -102,7 +102,7 @@ contract GameItem is ERC721AQueryable, Ownable, VRFConsumerBaseV2 {
             _amount + _currentIndex <= maxTotalSupply,
             "MAX_SUPPLY_REACHED"
         );
-        require(msg.value == _amount * mintPrice, "INCORRECT_ETH_AMOUNT");
+        require(msg.value >= _amount * mintPrice, "INCORRECT_ETH_AMOUNT");
         whitelistUsed[msg.sender] = true;
         _safeMint(msg.sender, _amount);
 
